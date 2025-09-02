@@ -1,15 +1,13 @@
-from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# 1️⃣ Create FastAPI app first
 app = FastAPI()
 
-# 2️⃣ Then add middleware
+# Add this **before defining routes**
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=["https://attendance-app-y205.onrender.com"],  # frontend URL
     allow_credentials=True,
-    allow_methods=["*"], 
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
