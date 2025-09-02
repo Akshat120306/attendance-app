@@ -27,7 +27,7 @@
     // ✅ Signup form
     document.getElementById("signupForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      const res = await fetch("http://127.0.0.1:8000/signup", {
+      const res = await fetch("https://attendance-app-41q8.onrender.com/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -49,7 +49,7 @@
     // ✅ Login form
     document.getElementById("loginForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      const res = await fetch("http://127.0.0.1:8000/login", {
+      const res = await fetch("https://attendance-app-41q8.onrender.com/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
