@@ -29,7 +29,7 @@
 
     // Load classes
     async function loadClasses() {
-      const res = await fetch("http://127.0.0.1:8000/my_classes?token=" + token);
+      const res = await fetch("https://attendance-app-41q8.onrender.com/my_classes?token=" + token);
       const data = await res.json();
       let html = "";
       if (data.classes && data.classes.length > 0) {
@@ -48,7 +48,7 @@
     // Create class
     document.getElementById("createForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      const res = await fetch("http://127.0.0.1:8000/create_class?token=" + token + "&name=" + document.getElementById("className").value, {
+      const res = await fetch("https://attendance-app-41q8.onrender.com/create_class?token=" + token + "&name=" + document.getElementById("className").value, {
         method: "POST"
       });
       const data = await res.json();
@@ -59,7 +59,7 @@
     // Join class
     document.getElementById("joinForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      const res = await fetch("http://127.0.0.1:8000/join_class?token=" + token + "&joinCode=" + document.getElementById("joinCode").value, {
+      const res = await fetch("https://attendance-app-41q8.onrender.com/join_class?token=" + token + "&joinCode=" + document.getElementById("joinCode").value, {
         method: "POST"
       });
       const data = await res.json();
