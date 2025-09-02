@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Dashboard</h1>
+
+  <h2>Create Class</h2>
+  <form id="createForm">
+    <input type="text" id="className" placeholder="Class name" required>
+    <button type="submit">Create</button>
+  </form>
+
+  <h2>Join Class</h2>
+  <form id="joinForm">
+    <input type="text" id="joinCode" placeholder="Join code" required>
+    <button type="submit">Join</button>
+  </form>
+
+  <h2>My Classes</h2>
+  <ul id="classList"></ul>
+
+  <script>
+    const token = localStorage.getItem("token");
+    if (!token) window.location.href = "index.html";
+
+    // Load classes
+    async function loadClasses() {
+      const res = await fetch("http://127.0.0.1:8000/my_classes?token=" + token);
+      const data = await res.json();
+      let html = "";
+      if (data.classes && data.classes.length > 0) {
+        data.classes.forEach(c => {
+          html += `<li>
+            ${c.name} (${c.role}) 
+            - <button onclick="openClass('${c.id}')">Open</button>
+          </li>`;
+        });
+      } else {
+        html = "<li>No classes yet</li>";
+      }
+      document.getElementById("classList").innerHTML = html;
+    }
+
+    // Create class
+    document.getElementById("createForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const res = await fetch("http://127.0.0.1:8000/create_class?token=" + token + "&name=" + document.getElementById("className").value, {
+        method: "POST"
+      });
+      const data = await res.json();
+      alert("Class created! Join code: " + data.joinCode);
+      loadClasses();
+    });
+
+    // Join class
+    document.getElementById("joinForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const res = await fetch("http://127.0.0.1:8000/join_class?token=" + token + "&joinCode=" + document.getElementById("joinCode").value, {
+        method: "POST"
+      });
+      const data = await res.json();
+      alert(data.msg || "Joined class!");
+      loadClasses();
+    });
+
+    function openClass(id) {
+      localStorage.setItem("classId", id);
+      window.location.href = "class.html";
+    }
+
+    loadClasses();
+  </script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Class</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/html5-qrcode"></script>
+</head>
+<body>
+  <h1>Class Page</h1>
+
+  <!-- Teacher section -->
+  <div id="teacherSection" style="display:none;">
+    <button onclick="startSession()">Start Session</button>
+    <div id="qr"></div>
+
+    <h2>Students</h2>
+    <ul id="studentList"></ul>
+  </div>
+
+  <!-- Student section -->
+  <div id="studentSection" style="display:none;">
+    <h2>Scan QR to Mark Attendance</h2>
+    <div id="reader" style="width:300px; margin:10px auto;"></div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem("token");
+    const classId = localStorage.getItem("classId");
+    if (!token || !classId) window.location.href = "dashboard.html";
+
+    let role = null;
+
+    async function getRoleAndSetup() {
+      const res = await fetch("http://127.0.0.1:8000/my_classes?token=" + token);
+      const data = await res.json();
+      const cls = data.classes.find(c => c.id === classId);
+      role = cls ? cls.role : null;
+
+      if (role === "teacher") {
+        document.getElementById("teacherSection").style.display = "block";
+        loadStudents();
+      } else if (role === "student") {
+        document.getElementById("studentSection").style.display = "block";
+        startQrScanner();
+      }
+    }
+
+    async function startSession() {
+      const res = await fetch(`http://127.0.0.1:8000/start_session?token=${token}&classId=${classId}`, { method: "POST" });
+      const data = await res.json();
+      if (data.qr) {
+        document.getElementById("qr").innerHTML = `<img src="${data.qr}" width="200">`;
+        localStorage.setItem("sessionId", data.sessionId);
+      } else {
+        alert(data.detail || "Failed to start session");
+      }
+    }
+
+    async function loadStudents() {
+      const res = await fetch(`http://127.0.0.1:8000/class_students?token=${token}&classId=${classId}`);
+      const data = await res.json();
+      let html = "";
+      data.students.forEach(s => {
+        html += `<li>${s.name} (${s.email}) 
+          <button onclick="teacherMark('${s.id}')">Mark Present</button>
+        </li>`;
+      });
+      document.getElementById("studentList").innerHTML = html;
+    }
+
+    async function teacherMark(studentId) {
+      const sessionId = localStorage.getItem("sessionId");
+      if (!sessionId) return alert("No active session");
+      const res = await fetch(`http://127.0.0.1:8000/teacher_mark_attendance?token=${token}&classId=${classId}&studentId=${studentId}&sessionId=${sessionId}`, {
+        method: "POST"
+      });
+      const data = await res.json();
+      alert(data.msg || data.detail);
+    }
+
+    // Student QR scanner
+    async function startQrScanner() {
+      const qrReader = new Html5Qrcode("reader");
+      qrReader.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: 250 },
+        async qrCodeMessage => {
+          const [scannedClassId, sessionId] = qrCodeMessage.split(":");
+          if (scannedClassId !== classId) {
+            alert("Invalid QR for this class!");
+            return;
+          }
+
+          const res = await fetch(`http://127.0.0.1:8000/mark_attendance_qr?token=${token}&sessionId=${sessionId}`, {
+            method: "POST"
+          });
+          const data = await res.json();
+          alert(data.msg || data.detail);
+          qrReader.stop(); // stop scanning after success/failure
+        },
+        errorMsg => { /* ignore scan errors */ }
+      );
+    }
+
+    getRoleAndSetup();
+  </script>
+</body>
+</html>
