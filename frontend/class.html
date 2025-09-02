@@ -32,7 +32,7 @@
     let role = null;
 
     async function getRoleAndSetup() {
-      const res = await fetch("http://127.0.0.1:8000/my_classes?token=" + token);
+      const res = await fetch("https://attendance-app-41q8.onrender.com/my_classes?token=" + token);
       const data = await res.json();
       const cls = data.classes.find(c => c.id === classId);
       role = cls ? cls.role : null;
@@ -47,7 +47,7 @@
     }
 
     async function startSession() {
-      const res = await fetch(`http://127.0.0.1:8000/start_session?token=${token}&classId=${classId}`, { method: "POST" });
+      const res = await fetch(`https://attendance-app-41q8.onrender.com/start_session?token=${token}&classId=${classId}`, { method: "POST" });
       const data = await res.json();
       if (data.qr) {
         document.getElementById("qr").innerHTML = `<img src="${data.qr}" width="200">`;
@@ -58,7 +58,7 @@
     }
 
     async function loadStudents() {
-      const res = await fetch(`http://127.0.0.1:8000/class_students?token=${token}&classId=${classId}`);
+      const res = await fetch(`https://attendance-app-41q8.onrender.com/class_students?token=${token}&classId=${classId}`);
       const data = await res.json();
       let html = "";
       data.students.forEach(s => {
@@ -72,7 +72,7 @@
     async function teacherMark(studentId) {
       const sessionId = localStorage.getItem("sessionId");
       if (!sessionId) return alert("No active session");
-      const res = await fetch(`http://127.0.0.1:8000/teacher_mark_attendance?token=${token}&classId=${classId}&studentId=${studentId}&sessionId=${sessionId}`, {
+      const res = await fetch(`https://attendance-app-41q8.onrender.com/teacher_mark_attendance?token=${token}&classId=${classId}&studentId=${studentId}&sessionId=${sessionId}`, {
         method: "POST"
       });
       const data = await res.json();
@@ -92,7 +92,7 @@
             return;
           }
 
-          const res = await fetch(`http://127.0.0.1:8000/mark_attendance_qr?token=${token}&sessionId=${sessionId}`, {
+          const res = await fetch(`https://attendance-app-41q8.onrender.com/mark_attendance_qr?token=${token}&sessionId=${sessionId}`, {
             method: "POST"
           });
           const data = await res.json();
