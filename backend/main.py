@@ -1,16 +1,15 @@
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-origins = [
-    "http://127.0.0.1:5500",   # your local frontend (Live Server)
-    "http://localhost:5500",
-    "https://attendance-app-41q8.onrender.com",  # deployed frontend URL
-]
+# 1️⃣ Create FastAPI app first
+app = FastAPI()
 
+# 2️⃣ Then add middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"], 
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["*"], 
     allow_headers=["*"],
 )
 
